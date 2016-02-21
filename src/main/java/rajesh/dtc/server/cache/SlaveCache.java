@@ -55,7 +55,7 @@ public class SlaveCache {
 
     protected List<Slave> loadSlavesFromZookeeper() throws Exception {
         System.out.println("loading from data source");
-        List<String> slaveStrings = curatorFramework.getChildren().usingWatcher(watcher).forPath(serverConfig.getSlaveRoot());
+        List<String> slaveStrings = curatorFramework.getChildren().usingWatcher(watcher).forPath(serverConfig.getSlaveRootPath());
         final List<Slave> slaves = new ArrayList<Slave>();
         slaveStrings.forEach(new Consumer<String>() {
             @Override

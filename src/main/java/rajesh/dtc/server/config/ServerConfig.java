@@ -1,7 +1,6 @@
 package rajesh.dtc.server.config;
 
 import org.apache.curator.RetryPolicy;
-import org.apache.curator.retry.ExponentialBackoffRetry;
 
 /**
  * Created by rajesh on 2/19/16.
@@ -23,4 +22,24 @@ public interface ServerConfig {
     public String getSlaveRoot();
 
     public String getTaskRoot();
+
+    default public  String getTaskRootPath() {
+        return "/" + getTaskRoot();
+    }
+
+    default public  String getRootPath() {
+        return "/" + getDTCRoot();
+    }
+
+    default public  String getTaskPath(String taskId) {
+        return "/" + getTaskRoot() + "/" + taskId;
+    }
+
+    default public String getSlaveRootPath() {
+        return "/" + getSlaveRoot();
+    }
+
+    default public  String getSlavePath(String slaveId) {
+        return getSlaveRootPath() + "/" + slaveId;
+    }
 }

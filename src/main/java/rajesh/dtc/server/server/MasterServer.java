@@ -1,6 +1,8 @@
 package rajesh.dtc.server.server;
 
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import rajesh.dtc.server.Slave;
 import rajesh.dtc.server.config.ServerConfig;
 import rajesh.dtc.server.server.BaseServer;
@@ -11,6 +13,8 @@ import java.util.List;
  * Created by rajesh on 2/18/16.
  */
 public abstract class MasterServer extends BaseServer {
+
+    private static Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
     private InterProcessMutex masterLock;
 
@@ -39,6 +43,15 @@ public abstract class MasterServer extends BaseServer {
     @Override
     protected void join() {
         becomeMaster();
+    }
+
+    protected List<Slave> getSlaves() {
+        try {
+            return slaveCache.getSlaves();
+        } catch (Exception e) {
+            logger.error("Error retrieving slaves from slave cache", e);
+        }
+        return null;
     }
 
     @Override

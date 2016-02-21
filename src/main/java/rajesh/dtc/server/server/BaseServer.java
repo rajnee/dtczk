@@ -3,6 +3,7 @@ package rajesh.dtc.server.server;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.proto.ExistsResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rajesh.dtc.server.Slave;
@@ -30,7 +31,7 @@ public abstract class BaseServer {
     }
 
 
-    protected void establishZookeeperConnection() {
+    protected void establishZookeeperConnection() throws Exception{
         CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder();
         builder.connectionTimeoutMs(serverConfig.getConnectionTimeout()).connectString(serverConfig.getConnectionString());
         builder.retryPolicy(serverConfig.getRetryPolicy());
@@ -38,12 +39,19 @@ public abstract class BaseServer {
         curatorFramework = builder.build();
         curatorFramework.start();
         this.slaveCache = new SlaveCache(curatorFramework, serverConfig);
+        setupRoots();
+    }
+
+    private void setupRoots() throws Exception{
+        curatorFramework.create().forPath("/" + serverConfig.getDTCRoot());
+        curatorFramework.create().forPath("/" + serverConfig.getSlaveRoot());
+        curatorFramework.create().forPath("/" + serverConfig.getTaskRoot());
     }
 
     protected abstract void join() throws Exception;
 
     protected void loop() {
-        while(true) {
+        while(!stopped) {
             try {
                 process();
             } catch (Exception e) {
@@ -52,20 +60,11 @@ public abstract class BaseServer {
         }
     }
 
-
-    protected List<Slave> getSlaves() {
-        try {
-            return slaveCache.getSlaves();
-        } catch (Exception e) {
-            logger.error("Error retrieving slaves from slave cache", e);
-        }
-        return null;
+    private boolean stopped;
+    void stop() {
+        stopped = true;
     }
 
-    protected boolean registerSlave(String id, String data) throws Exception {
-        curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath(serverConfig.getSlaveRoot() + "/" + id, data.getBytes() );
-        return true;
-    }
     protected abstract void process() throws Exception;
 
     protected void start() throws Exception {
@@ -74,13 +73,13 @@ public abstract class BaseServer {
         loop();
     }
 
-    protected List<Task> getTasks() {
+    protected List<Task> getTasksForPath(String slaveServerTaskPath) {
         try {
-            List<String> taskIds = curatorFramework.getChildren().forPath(getSlaveServerTaskPath());
+            List<String> taskIds = curatorFramework.getChildren().forPath(slaveServerTaskPath);
             List<Task> tasks = new ArrayList<Task>(taskIds.size());
             for (String s: taskIds) {
                 try {
-                    SimpleTask st = new SimpleTask(s);
+                    SimpleTask st = new SimpleTask(s, slaveServerTaskPath);
                     tasks.add(st);
                 } catch (Exception e) {
                     logger.error("error creating simple task {}", s, e);
@@ -93,20 +92,18 @@ public abstract class BaseServer {
         }
     }
 
-    private String getSlaveServerTaskPath() {
-        return  serverConfig.getTaskRoot() + "/" + serverConfig.getServerId();
-    }
-
-    protected void markComplete(Task t) throws Exception {
-        curatorFramework.delete().forPath(getSlaveServerTaskPath() + "/" + t.getId());
+    protected String getTaskPathForServer(String serverId) {
+        return  serverConfig.getTaskRoot() + "/" + serverId;
     }
 
     protected class SimpleTask implements Task {
         private final String id;
         private String data;
+        private final String slaveServerPath;
 
-        private SimpleTask(String id) throws Exception {
+        private SimpleTask(String id, String slaveServerPath) throws Exception {
             this.id = id;
+            this.slaveServerPath = slaveServerPath;
             getData();
         }
 
@@ -118,7 +115,7 @@ public abstract class BaseServer {
 
         @Override
         public byte[] getData() throws Exception{
-            return curatorFramework.getData().forPath(getSlaveServerTaskPath() + "/" + id);
+            return curatorFramework.getData().forPath(slaveServerPath + "/" + id);
         }
     }
 }
