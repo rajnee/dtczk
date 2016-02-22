@@ -22,6 +22,7 @@ public abstract class BaseServer {
     protected ServerConfig serverConfig;
     protected CuratorFramework curatorFramework;
     protected TasksNode tasksNode;
+    protected SlavesNode slavesNode;
 
     protected SlaveCache slaveCache;
 
@@ -38,14 +39,23 @@ public abstract class BaseServer {
         builder.namespace(serverConfig.getDTCRoot());
         curatorFramework = builder.build();
         curatorFramework.start();
-        this.slaveCache = new SlaveCache(curatorFramework, serverConfig);
         this.tasksNode = new TasksNode(serverConfig.getTaskRootPath(), curatorFramework);
+        this.slavesNode = new SlavesNode(serverConfig.getSlaveRootPath(), curatorFramework);
+        this.slaveCache = new SlaveCache(slavesNode, serverConfig);
         setupRoots();
     }
 
     private void setupRoots() throws Exception{
-        curatorFramework.create().forPath(serverConfig.getRootPath());
-        curatorFramework.create().forPath(serverConfig.getSlaveRootPath());
+        try {
+            curatorFramework.create().forPath(serverConfig.getRootPath());
+        } catch (KeeperException.NodeExistsException e) {
+        }
+
+        try {
+            curatorFramework.create().forPath(serverConfig.getSlaveRootPath());
+        } catch (KeeperException.NodeExistsException e) {
+        }
+
         try {
             curatorFramework.create().forPath(serverConfig.getTaskRootPath());
         } catch (KeeperException.NodeExistsException e) {

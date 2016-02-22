@@ -1,5 +1,6 @@
 package rajesh.dtcframework.cache;
 
+import org.apache.zookeeper.KeeperException;
 import org.junit.Before;
 import org.junit.Test;
 import rajesh.dtcframework.BaseDTCTest;
@@ -19,7 +20,7 @@ public class SlaveCacheTest extends BaseDTCTest {
     @Override
     public void setup() throws Exception {
         super.setup();
-        slaveCache = new SlaveCache(curatorFramework, serverConfig);
+        slaveCache = new SlaveCache(slavesNode, serverConfig);
         setupRoots();
         //Add some slaves
         curatorFramework.create().forPath(serverConfig.getSlavePath("slave1"));
@@ -28,7 +29,10 @@ public class SlaveCacheTest extends BaseDTCTest {
 
     private void setupRoots() throws Exception{
         curatorFramework.create().forPath("/" + serverConfig.getDTCRoot());
-        curatorFramework.create().forPath("/" + serverConfig.getSlaveRoot());
+        try {
+            curatorFramework.create().forPath("/" + serverConfig.getSlaveRoot());
+        } catch (KeeperException.NodeExistsException e) {
+        }
         curatorFramework.create().forPath("/" + serverConfig.getTaskRoot());
     }
 

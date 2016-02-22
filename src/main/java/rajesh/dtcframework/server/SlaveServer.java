@@ -21,14 +21,9 @@ public abstract class SlaveServer extends BaseServer {
         super(serverConfig);
     }
 
-    protected boolean registerSlave(String id, String data) throws Exception {
-        curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath(serverConfig.getSlaveRootPath() + "/" + id, data.getBytes() );
-        return true;
-    }
-
     @Override
     protected void join() throws Exception {
-        registerSlave(serverConfig.getServerId(), "");
+        slavesNode.join(getServerId(), "".getBytes());
         tasksNode.joinTask(getServerId());
     }
 

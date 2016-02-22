@@ -6,6 +6,7 @@ import org.apache.curator.framework.api.CuratorWatcher;
 import org.apache.zookeeper.WatchedEvent;
 import rajesh.dtcframework.Slave;
 import rajesh.dtcframework.config.ServerConfig;
+import rajesh.dtcframework.server.SlavesNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,25 +18,18 @@ import java.util.function.Consumer;
  */
 public class SlaveCache {
 
-    private CuratorFramework curatorFramework;
     private ServerConfig serverConfig;
+    private SlavesNode slavesNode;
 
     private LoadingCache<String, List<Slave>> slaveCache;
 //TODO: when slaves leave, we need to take care of cleaning up Task Nodes for the slave and reassigning
 
-    private CuratorWatcher watcher = new CuratorWatcher() {
-        @Override
-        public void process(WatchedEvent watchedEvent) throws Exception {
-            refresh();
-        }
-    };
-
-    public SlaveCache(final CuratorFramework curatorFramework, final ServerConfig serverConfig) {
-        this.curatorFramework = curatorFramework;
+    public SlaveCache(final SlavesNode slavesNode, final ServerConfig serverConfig) {
+        this.slavesNode = slavesNode;
         this.serverConfig = serverConfig;
 
         slaveCache =  CacheBuilder.newBuilder()
-                .maximumSize(10000)
+                .maximumSize(1000)
                 .expireAfterWrite(10, TimeUnit.MINUTES)
                 .build(
                         new CacheLoader<String, List<Slave>>() {
@@ -54,16 +48,12 @@ public class SlaveCache {
     }
 
     protected List<Slave> loadSlavesFromZookeeper() throws Exception {
-        System.out.println("loading from data source");
-        List<String> slaveStrings = curatorFramework.getChildren().usingWatcher(watcher).forPath(serverConfig.getSlaveRootPath());
+        System.out.println("loading slaves from data source");
+        List<String> slaveStrings = slavesNode.getSlaves( () -> refresh());
         final List<Slave> slaves = new ArrayList<Slave>();
-        slaveStrings.forEach(new Consumer<String>() {
-            @Override
-            public void accept(String s) {
-                SimpleSlave sl = new SimpleSlave(s, true);
-                slaves.add(sl);
-            }
-        });
+        for (String s: slaveStrings) {
+            slaves.add(new SimpleSlave(s, true));
+        }
         return slaves;
     }
 }

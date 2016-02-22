@@ -7,6 +7,7 @@ import org.junit.Before;
 import rajesh.dtcframework.config.ServerConfig;
 import rajesh.dtcframework.config.json.JsonServerConfig;
 import rajesh.dtcframework.config.json.ServerConfigFactory;
+import rajesh.dtcframework.server.SlavesNode;
 
 import java.io.File;
 import java.net.URL;
@@ -19,6 +20,7 @@ public abstract class BaseDTCTest {
     protected TestingServer testingServer;
     protected ServerConfig serverConfig;
     protected CuratorFramework curatorFramework;
+    protected SlavesNode slavesNode;
 
     protected abstract String getConfigFileName();
     @Before
@@ -31,6 +33,7 @@ public abstract class BaseDTCTest {
         jsonServerConfig.connection_string = testingServer.getConnectString();
         serverConfig = jsonServerConfig;
         setupCuratorFramework();
+        slavesNode = new SlavesNode(serverConfig.getSlaveRootPath(), curatorFramework);
     }
 
     public void setupCuratorFramework() throws Exception {
