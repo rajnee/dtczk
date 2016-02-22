@@ -1,11 +1,11 @@
-package rajesh.dtcframework.server.server;
+package rajesh.dtcframework.server;
 
 import org.apache.zookeeper.data.Stat;
 import org.junit.Before;
 import org.junit.Test;
-import rajesh.dtcframework.server.BaseDTCTest;
-import rajesh.dtcframework.server.Task;
-import rajesh.dtcframework.server.config.ServerConfig;
+import rajesh.dtcframework.config.ServerConfig;
+import rajesh.dtcframework.BaseDTCTest;
+import rajesh.dtcframework.Task;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;

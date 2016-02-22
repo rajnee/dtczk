@@ -1,4 +1,4 @@
-package rajesh.dtcframework.server;
+package rajesh.dtcframework;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
-package rajesh.dtcframework.server.config.json;
+package rajesh.dtcframework.config.json;
 
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import rajesh.dtcframework.server.config.ServerConfig;
+import rajesh.dtcframework.config.ServerConfig;
 
 /**
  * Created by rajesh on 2/20/16.

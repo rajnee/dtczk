@@ -1,12 +1,12 @@
-package rajesh.dtcframework.server.server;
+package rajesh.dtcframework.server;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rajesh.dtcframework.server.Task;
-import rajesh.dtcframework.server.cache.SlaveCache;
-import rajesh.dtcframework.server.config.ServerConfig;
+import rajesh.dtcframework.cache.SlaveCache;
+import rajesh.dtcframework.config.ServerConfig;
+import rajesh.dtcframework.Task;
 
 import java.util.ArrayList;
 import java.util.List;

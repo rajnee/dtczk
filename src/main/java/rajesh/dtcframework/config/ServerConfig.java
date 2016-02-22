@@ -1,4 +1,4 @@
-package rajesh.dtcframework.server.config;
+package rajesh.dtcframework.config;
 
 import org.apache.curator.RetryPolicy;
 

@@ -1,9 +1,9 @@
-package rajesh.dtcframework.server.cache;
+package rajesh.dtcframework.cache;
 
 import org.junit.Before;
 import org.junit.Test;
-import rajesh.dtcframework.server.BaseDTCTest;
-import rajesh.dtcframework.server.Slave;
+import rajesh.dtcframework.BaseDTCTest;
+import rajesh.dtcframework.Slave;
 
 import java.util.List;
 import static org.junit.Assert.*;

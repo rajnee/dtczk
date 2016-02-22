@@ -1,13 +1,13 @@
-package rajesh.dtcframework.server.server;
+package rajesh.dtcframework.server;
 
 import org.apache.curator.framework.api.CreateBuilder;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rajesh.dtcframework.server.Slave;
-import rajesh.dtcframework.server.Task;
-import rajesh.dtcframework.server.config.ServerConfig;
+import rajesh.dtcframework.config.ServerConfig;
+import rajesh.dtcframework.Slave;
+import rajesh.dtcframework.Task;
 
 import java.util.List;
 

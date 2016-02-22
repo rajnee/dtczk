@@ -1,7 +1,7 @@
-package rajesh.dtcframework.server.config.json;
+package rajesh.dtcframework.config.json;
 
 import org.junit.Test;
-import rajesh.dtcframework.server.config.ServerConfig;
+import rajesh.dtcframework.config.ServerConfig;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -1,12 +1,12 @@
-package rajesh.dtcframework.server.server;
+package rajesh.dtcframework.server;
 
 import org.apache.curator.framework.api.CuratorWatcher;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.WatchedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rajesh.dtcframework.server.Task;
-import rajesh.dtcframework.server.config.ServerConfig;
+import rajesh.dtcframework.Task;
+import rajesh.dtcframework.config.ServerConfig;
 
 import java.util.List;
 

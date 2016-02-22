@@ -1,7 +1,7 @@
-package rajesh.dtcframework.server.cache;
+package rajesh.dtcframework.cache;
 
-import rajesh.dtcframework.server.Slave;
-import rajesh.dtcframework.server.Task;
+import rajesh.dtcframework.Slave;
+import rajesh.dtcframework.Task;
 
 import java.util.List;
 

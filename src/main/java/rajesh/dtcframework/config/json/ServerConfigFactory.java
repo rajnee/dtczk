@@ -1,8 +1,8 @@
-package rajesh.dtcframework.server.config.json;
+package rajesh.dtcframework.config.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import rajesh.dtcframework.server.config.ServerConfig;
+import rajesh.dtcframework.config.ServerConfig;
 
 import java.io.File;
 import java.io.FileNotFoundException;

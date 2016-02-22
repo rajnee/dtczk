@@ -1,9 +1,9 @@
-package rajesh.dtcframework.server.server;
+package rajesh.dtcframework.server;
 
 import org.junit.Before;
 import org.junit.Test;
-import rajesh.dtcframework.server.BaseDTCTest;
-import rajesh.dtcframework.server.config.ServerConfig;
+import rajesh.dtcframework.BaseDTCTest;
+import rajesh.dtcframework.config.ServerConfig;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;

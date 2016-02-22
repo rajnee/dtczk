@@ -1,11 +1,11 @@
-package rajesh.dtcframework.server.cache;
+package rajesh.dtcframework.cache;
 
 import com.google.common.cache.*;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.CuratorWatcher;
 import org.apache.zookeeper.WatchedEvent;
-import rajesh.dtcframework.server.Slave;
-import rajesh.dtcframework.server.config.ServerConfig;
+import rajesh.dtcframework.Slave;
+import rajesh.dtcframework.config.ServerConfig;
 
 import java.util.ArrayList;
 import java.util.List;

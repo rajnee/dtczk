@@ -1,4 +1,4 @@
-package rajesh.dtcframework.server.config.json;
+package rajesh.dtcframework.config.json;
 
 /**
  * Created by rajesh on 2/20/16.

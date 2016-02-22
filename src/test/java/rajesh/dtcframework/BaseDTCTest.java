@@ -1,12 +1,12 @@
-package rajesh.dtcframework.server;
+package rajesh.dtcframework;
 
 import com.netflix.curator.test.TestingServer;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.junit.Before;
-import rajesh.dtcframework.server.config.ServerConfig;
-import rajesh.dtcframework.server.config.json.JsonServerConfig;
-import rajesh.dtcframework.server.config.json.ServerConfigFactory;
+import rajesh.dtcframework.config.ServerConfig;
+import rajesh.dtcframework.config.json.JsonServerConfig;
+import rajesh.dtcframework.config.json.ServerConfigFactory;
 
 import java.io.File;
 import java.net.URL;

@@ -1,4 +1,4 @@
-package rajesh.dtcframework.server;
+package rajesh.dtcframework;
 
 /**
  * Created by rajesh on 2/20/16.
