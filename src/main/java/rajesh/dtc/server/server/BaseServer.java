@@ -61,6 +61,10 @@ public abstract class BaseServer {
         }
     }
 
+    public boolean isStopped() {
+        return stopped;
+    }
+
     private boolean stopped;
     void stop() {
         stopped = true;
@@ -118,6 +122,11 @@ public abstract class BaseServer {
         @Override
         public byte[] getData() throws Exception{
             return curatorFramework.getData().forPath(slaveServerPath + "/" + id);
+        }
+
+        @Override
+        public String toString() {
+            return "[" + id + "," + data + "]";
         }
     }
 }

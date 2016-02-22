@@ -1,7 +1,9 @@
 package rajesh.dtc.server.server;
 
 import org.apache.curator.framework.api.CreateBuilder;
+import org.apache.curator.framework.api.CuratorWatcher;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.WatchedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rajesh.dtc.server.Task;
@@ -34,13 +36,17 @@ public abstract class SlaveServer extends BaseServer {
 
     @Override
     protected void process() throws Exception {
-        List<Task> tasks = getTasks();
-        for (Task t: tasks) {
-            try {
-                executeTask(t);
-                markComplete(t);
-            } catch (Exception e) {
-                logger.warn("Error executing task (ignoring):" + t);
+        List<Task> tasks = null;
+
+        tasks = getTasks();
+        if (tasks != null) {
+            for (Task t : tasks) {
+                try {
+                    executeTask(t);
+                    markComplete(t);
+                } catch (Exception e) {
+                    logger.warn("Error executing task (ignoring):" + t);
+                }
             }
         }
     }
@@ -50,8 +56,30 @@ public abstract class SlaveServer extends BaseServer {
         curatorFramework.delete().forPath(getSlaveServerTaskPath() + "/" + t.getId());
     }
 
+    private Object tasksLock = new Object();
+
+    private CuratorWatcher watcher = new CuratorWatcher() {
+        @Override
+        public void process(WatchedEvent watchedEvent) throws Exception {
+            synchronized (tasksLock) {
+                tasksLock.notifyAll();
+            }
+        }
+    };
+
     protected List<Task> getTasks() throws Exception{
-        return getTasksForPath(getSlaveServerTaskPath());
+        List<Task> tasks = null;
+        while (tasks == null || tasks.size() == 0) {
+            if (isStopped()) break;
+            tasks = getTasksForPath(getSlaveServerTaskPath());
+            if (tasks.size() == 0) {
+                synchronized (tasksLock) {
+                    curatorFramework.checkExists().usingWatcher(watcher).forPath(getSlaveServerTaskPath());
+                    tasksLock.wait(5000);
+                }
+            }
+        }
+        return tasks;
     }
 
     protected String getSlaveServerTaskPath() {
