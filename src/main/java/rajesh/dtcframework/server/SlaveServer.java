@@ -29,7 +29,7 @@ public abstract class SlaveServer extends BaseServer {
     @Override
     protected void join() throws Exception {
         registerSlave(serverConfig.getServerId(), "");
-        curatorFramework.create().forPath(getSlaveServerTaskPath());
+        tasksNode.joinTask(getServerId());
     }
 
     @Override
@@ -51,7 +51,7 @@ public abstract class SlaveServer extends BaseServer {
 
 
     protected void markComplete(Task t) throws Exception {
-        curatorFramework.delete().forPath(getSlaveServerTaskPath() + "/" + t.getId());
+        tasksNode.markComplete(getServerId(), t);
     }
 
     private Object tasksLock = new Object();
@@ -69,10 +69,10 @@ public abstract class SlaveServer extends BaseServer {
         List<Task> tasks = null;
         while (tasks == null || tasks.size() == 0) {
             if (isStopped()) break;
-            tasks = getTasksForPath(getSlaveServerTaskPath());
+            tasks = tasksNode.getTasks(getServerId());
             if (tasks.size() == 0) {
                 synchronized (tasksLock) {
-                    curatorFramework.checkExists().usingWatcher(watcher).forPath(getSlaveServerTaskPath());
+                    curatorFramework.checkExists().usingWatcher(watcher).forPath(tasksNode.getSlaveServerTaskPath(getServerId()));
                     tasksLock.wait(5000);
                 }
             }
@@ -80,10 +80,11 @@ public abstract class SlaveServer extends BaseServer {
         return tasks;
     }
 
-    protected String getSlaveServerTaskPath() {
-        return  getTaskPathForServer(serverConfig.getServerId());
-    }
 
+    public final String getSlaveServerTaskPath() {
+        return tasksNode.getSlaveServerTaskPath(getServerId());
+    }
     protected abstract void executeTask(Task t) throws Exception;
+
 
 }

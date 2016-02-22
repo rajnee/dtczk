@@ -2,6 +2,7 @@ package rajesh.dtcframework.server;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.zookeeper.KeeperException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rajesh.dtcframework.cache.SlaveCache;
@@ -20,6 +21,7 @@ public abstract class BaseServer {
 
     protected ServerConfig serverConfig;
     protected CuratorFramework curatorFramework;
+    protected TasksNode tasksNode;
 
     protected SlaveCache slaveCache;
 
@@ -27,6 +29,7 @@ public abstract class BaseServer {
         this.serverConfig = serverConfig;
     }
 
+    public final String getServerId() { return serverConfig.getServerId(); }
 
     protected void establishZookeeperConnection() throws Exception{
         CuratorFrameworkFactory.Builder builder = CuratorFrameworkFactory.builder();
@@ -36,13 +39,18 @@ public abstract class BaseServer {
         curatorFramework = builder.build();
         curatorFramework.start();
         this.slaveCache = new SlaveCache(curatorFramework, serverConfig);
+        this.tasksNode = new TasksNode(serverConfig.getTaskRootPath(), curatorFramework);
         setupRoots();
     }
 
     private void setupRoots() throws Exception{
         curatorFramework.create().forPath(serverConfig.getRootPath());
         curatorFramework.create().forPath(serverConfig.getSlaveRootPath());
-        curatorFramework.create().forPath(serverConfig.getTaskRootPath());
+        try {
+            curatorFramework.create().forPath(serverConfig.getTaskRootPath());
+        } catch (KeeperException.NodeExistsException e) {
+
+        }
     }
 
     protected abstract void join() throws Exception;
@@ -74,55 +82,4 @@ public abstract class BaseServer {
         loop();
     }
 
-    protected List<Task> getTasksForPath(String slaveServerTaskPath) {
-        try {
-            List<String> taskIds = curatorFramework.getChildren().forPath(slaveServerTaskPath);
-            List<Task> tasks = new ArrayList<Task>(taskIds.size());
-            for (String s: taskIds) {
-                try {
-                    SimpleTask st = new SimpleTask(s, slaveServerTaskPath);
-                    tasks.add(st);
-                } catch (Exception e) {
-                    logger.error("error creating simple task {}", s, e);
-                }
-            }
-            return tasks;
-        } catch (Exception e) {
-            logger.error("error retrieving tasks", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    protected String getTaskPathForServer(String serverId) {
-        return  serverConfig.getTaskRootPath() + "/" + serverId;
-    }
-
-    protected class SimpleTask implements Task {
-        private final String id;
-        private String data;
-        private final String slaveServerPath;
-
-        private SimpleTask(String id, String slaveServerPath) throws Exception {
-            this.id = id;
-            this.slaveServerPath = slaveServerPath;
-            getData();
-        }
-
-
-        @Override
-        public String getId() {
-            return id;
-        }
-
-        @Override
-        public byte[] getData() throws Exception{
-            return curatorFramework.getData().forPath(slaveServerPath + "/" + id);
-        }
-
-        @Override
-        public String toString() {
-            return "[" + id + "," + data + "]";
-        }
-    }
 }

@@ -31,8 +31,8 @@ public interface ServerConfig {
         return "/" + getDTCRoot();
     }
 
-    default public  String getTaskPath(String taskId) {
-        return "/" + getTaskRoot() + "/" + taskId;
+    default public  String getTaskPath(String slaveServerId, String taskId) {
+        return   "/" + getTaskRoot() + "/" + slaveServerId + "/" + taskId;
     }
 
     default public String getSlaveRootPath() {

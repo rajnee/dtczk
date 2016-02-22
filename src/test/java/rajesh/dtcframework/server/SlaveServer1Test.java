@@ -102,7 +102,7 @@ public class SlaveServer1Test extends BaseDTCTest {
         for (int i = 0; i < TASKS_COUNT; i++) {
             curatorFramework.create()
                     .withMode(CreateMode.PERSISTENT)
-                    .forPath(xServer.getSlaveServerTaskPath() + "/task" + i, "100".getBytes());
+                    .forPath(serverConfig.getTaskPath(serverConfig.getServerId(), "task" + i), "100".getBytes());
             Thread.currentThread().sleep(5);
         }
 
@@ -111,7 +111,7 @@ public class SlaveServer1Test extends BaseDTCTest {
         assertEquals(1, children.size());
 
         processCompletedLatch.await();
-        children = curatorFramework.getChildren().forPath(xServer.getSlaveServerTaskPath());
+        children = curatorFramework.getChildren().forPath(serverConfig.getTaskRootPath() + "/" + xServer.getServerId());
         assertEquals(0, children.size());
         xServer.stop();
 

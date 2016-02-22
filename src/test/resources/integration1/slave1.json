@@ -1,0 +1,15 @@
+{
+  "connection_string":"",
+  "server_id":"slave1",
+  "connection_timeout":5000,
+  "retry_params": {
+    "sleep_ms":5000,
+    "max_retries":3
+  },
+  "locations": {
+    "master_lock_path":"master",
+    "dtc_root":"dtc",
+    "slave_root":"slave",
+    "task_root":"tasks"
+  }
+}

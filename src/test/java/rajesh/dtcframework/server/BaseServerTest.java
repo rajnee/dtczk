@@ -68,6 +68,9 @@ public class BaseServerTest extends BaseDTCTest {
             try {
                 xServer.start();
             } catch (Exception e) {
+                System.out.println("Error starting base server");
+                e.printStackTrace();
+                return;
             }
         });
 
@@ -89,7 +92,7 @@ public class BaseServerTest extends BaseDTCTest {
         curatorFramework.create().forPath(slavePath + "/task4", "task1".getBytes());
 
 
-        List<Task> taskList = xServer.getTasksForPath(slavePath);
+        List<Task> taskList = xServer.tasksNode.getTasks("slave1");
         byte[] data = taskList.get(0).getData();
         assertEquals(new String(data), "task1");
         assertEquals(4, taskList.size());

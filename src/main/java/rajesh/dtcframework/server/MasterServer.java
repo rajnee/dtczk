@@ -56,12 +56,6 @@ public abstract class MasterServer extends BaseServer {
         return null;
     }
 
-    protected void createTask(Task t) throws  Exception {
-        CreateBuilder createBuilder = curatorFramework.create();
-        createBuilder.withMode(CreateMode.PERSISTENT);
-        createBuilder.forPath(serverConfig.getTaskPath(t.getId()), t.getData());
-    }
-
     @Override
     protected void process() throws Exception {
         if (isHavingMasterLock()) {
