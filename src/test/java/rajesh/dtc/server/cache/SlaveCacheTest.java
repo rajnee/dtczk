@@ -40,6 +40,11 @@ public class SlaveCacheTest extends BaseDTCTest {
         curatorFramework.create().forPath("/" + serverConfig.getTaskRoot());
     }
 
+    @Override
+    protected String getConfigFileName() {
+        return "testconfig1.json";
+    }
+
     @Test
     public void testSlaveCache() throws Exception {
         List<Slave> slaves = slaveCache.getSlaves();

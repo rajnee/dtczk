@@ -13,19 +13,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by rajesh on 2/21/16.
  */
-public class BaseServerTest extends BaseDTCTest {
+public class MasterServerTest extends BaseDTCTest {
 
-
-    static class XServer extends  BaseServer {
+    static class XServer extends  MasterServer {
         AtomicBoolean joinCalled = new AtomicBoolean();
-        AtomicInteger processCalled = new AtomicInteger();
         CountDownLatch latch;
         CountDownLatch serverReadyLatch;
+
         public XServer(ServerConfig serverConfig, CountDownLatch countDownLatch, CountDownLatch serverReadyLatch) {
             super(serverConfig);
             this.latch = countDownLatch;
@@ -35,22 +37,36 @@ public class BaseServerTest extends BaseDTCTest {
         @Override
         protected void join() throws Exception {
             joinCalled.set(true);
+            try {
+                super.join();
+            } catch (Exception e) {
+                serverReadyLatch.countDown();
+                e.printStackTrace();
+                throw e;
+            }
             serverReadyLatch.countDown();
+            System.out.println("Master server has joined the cluster: master lock = " + isHavingMasterLock());
         }
 
         @Override
         protected void process() throws Exception {
-            processCalled.incrementAndGet();
+            super.process();
+            System.out.println("Process has been called on Master, returning");
             latch.await();
         }
-    }
 
-    XServer xServer;
+        @Override
+        protected void schedule() {
+            System.out.println("Schedule called, doing nothing");
+        }
+    }
 
     @Override
     protected String getConfigFileName() {
         return "testconfig1.json";
     }
+
+    XServer xServer;
 
     @Before
     public void setup() throws Exception {
@@ -72,27 +88,11 @@ public class BaseServerTest extends BaseDTCTest {
         });
 
         serverReadyLatch.await();
-        Stat stat = curatorFramework.checkExists().forPath(serverConfig.getRootPath());
-        assertNotNull("Root path is null", stat);
-
-        stat = curatorFramework.checkExists().forPath(serverConfig.getSlaveRootPath());
-        assertNotNull("Slave Root path is null", stat);
-
-        stat = curatorFramework.checkExists().forPath(serverConfig.getTaskRootPath());
-        assertNotNull("Task Root path is null", stat);
 
         String slavePath = serverConfig.getTaskRootPath() + "/slave1";
         curatorFramework.create().forPath(slavePath);
-        curatorFramework.create().forPath(slavePath + "/task1", "task1".getBytes());
-        curatorFramework.create().forPath(slavePath + "/task2", "task1".getBytes());
-        curatorFramework.create().forPath(slavePath + "/task3", "task1".getBytes());
-        curatorFramework.create().forPath(slavePath + "/task4", "task1".getBytes());
 
-
-        List<Task> taskList = xServer.getTasksForPath(slavePath);
-        byte[] data = taskList.get(0).getData();
-        assertEquals(new String(data), "task1");
-        assertEquals(4, taskList.size());
+        assertTrue(xServer.isHavingMasterLock());
 
         countDownLatch.countDown();
         xServer.stop();

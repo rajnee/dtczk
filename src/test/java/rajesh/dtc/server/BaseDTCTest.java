@@ -14,16 +14,17 @@ import java.net.URL;
 /**
  * Created by rajesh on 2/21/16.
  */
-public class BaseDTCTest {
+public abstract class BaseDTCTest {
 
     protected TestingServer testingServer;
     protected ServerConfig serverConfig;
     protected CuratorFramework curatorFramework;
 
+    protected abstract String getConfigFileName();
     @Before
     public void setup() throws Exception {
         testingServer = new TestingServer();
-        URL url = System.class.getResource("/testconfig1.json");
+        URL url = System.class.getResource("/" + getConfigFileName());
         File file = new File(url.getFile());
         JsonServerConfig jsonServerConfig;
         jsonServerConfig = (JsonServerConfig) ServerConfigFactory.fromJson(file);

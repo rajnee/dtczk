@@ -1,9 +1,12 @@
 package rajesh.dtc.server.server;
 
+import org.apache.curator.framework.api.CreateBuilder;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
+import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rajesh.dtc.server.Slave;
+import rajesh.dtc.server.Task;
 import rajesh.dtc.server.config.ServerConfig;
 import rajesh.dtc.server.server.BaseServer;
 
@@ -27,7 +30,7 @@ public abstract class MasterServer extends BaseServer {
     }
 
     protected boolean becomeMaster() {
-        masterLock = new InterProcessMutex(curatorFramework, serverConfig.getMasterLockPath());
+        masterLock = new InterProcessMutex(curatorFramework, "/" + serverConfig.getMasterLockPath());
         while (!masterLock.isAcquiredInThisProcess()) {
             try {
                 //This should block and wait till it can acquire, a backup process will wait
@@ -41,7 +44,7 @@ public abstract class MasterServer extends BaseServer {
     }
 
     @Override
-    protected void join() {
+    protected void join() throws Exception {
         becomeMaster();
     }
 
@@ -52,6 +55,12 @@ public abstract class MasterServer extends BaseServer {
             logger.error("Error retrieving slaves from slave cache", e);
         }
         return null;
+    }
+
+    protected void createTask(Task t) throws  Exception {
+        CreateBuilder createBuilder = curatorFramework.create();
+        createBuilder.withMode(CreateMode.PERSISTENT);
+        createBuilder.forPath(serverConfig.getTaskPath(t.getId()), t.getData());
     }
 
     @Override

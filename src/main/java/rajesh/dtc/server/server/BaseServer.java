@@ -2,6 +2,7 @@ package rajesh.dtc.server.server;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.api.CreateBuilder;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.proto.ExistsResponse;
 import org.slf4j.Logger;
@@ -43,9 +44,9 @@ public abstract class BaseServer {
     }
 
     private void setupRoots() throws Exception{
-        curatorFramework.create().forPath("/" + serverConfig.getDTCRoot());
-        curatorFramework.create().forPath("/" + serverConfig.getSlaveRoot());
-        curatorFramework.create().forPath("/" + serverConfig.getTaskRoot());
+        curatorFramework.create().forPath(serverConfig.getRootPath());
+        curatorFramework.create().forPath(serverConfig.getSlaveRootPath());
+        curatorFramework.create().forPath(serverConfig.getTaskRootPath());
     }
 
     protected abstract void join() throws Exception;
@@ -92,8 +93,9 @@ public abstract class BaseServer {
         }
     }
 
+
     protected String getTaskPathForServer(String serverId) {
-        return  serverConfig.getTaskRoot() + "/" + serverId;
+        return  serverConfig.getTaskRootPath() + "/" + serverId;
     }
 
     protected class SimpleTask implements Task {
