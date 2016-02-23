@@ -1,5 +1,5 @@
 {
-  "connection_string":"localhost:2182,localhost:2183,localhost:2184",
+  "connection_string":"",
   "server_id":"master2",
   "connection_timeout":5000,
   "retry_params": {

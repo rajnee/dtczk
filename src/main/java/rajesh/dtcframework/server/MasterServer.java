@@ -66,5 +66,5 @@ public abstract class MasterServer extends BaseServer {
         }
     }
 
-    protected abstract void schedule();
+    protected abstract void schedule() throws Exception;
 }

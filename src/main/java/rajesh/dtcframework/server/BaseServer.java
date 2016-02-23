@@ -66,6 +66,7 @@ public abstract class BaseServer {
     protected abstract void join() throws Exception;
 
     protected void loop() {
+        logger.info(getServerId() + " - Beginning processing");
         while(!stopped) {
             try {
                 process();
@@ -80,7 +81,7 @@ public abstract class BaseServer {
     }
 
     private boolean stopped;
-    void stop() {
+    public void stop() {
         stopped = true;
     }
 
@@ -88,7 +89,9 @@ public abstract class BaseServer {
 
     protected void start() throws Exception {
         establishZookeeperConnection();
+        logger.info(getServerId() + " has successfully established Zookeeper connection");
         join();
+        logger.info(getServerId() + " successfully joined distributed task processing");
         loop();
     }
 

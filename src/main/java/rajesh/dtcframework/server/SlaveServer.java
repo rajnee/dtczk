@@ -68,7 +68,7 @@ public abstract class SlaveServer extends BaseServer {
             if (tasks.size() == 0) {
                 synchronized (tasksLock) {
                     curatorFramework.checkExists().usingWatcher(watcher).forPath(tasksNode.getSlaveServerTaskPath(getServerId()));
-                    tasksLock.wait(5000);
+                    tasksLock.wait(1000);
                 }
             }
         }

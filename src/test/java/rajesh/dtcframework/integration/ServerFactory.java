@@ -1,6 +1,7 @@
 package rajesh.dtcframework.integration;
 
 import rajesh.dtcframework.config.ServerConfig;
+import rajesh.dtcframework.config.json.JsonServerConfig;
 import rajesh.dtcframework.config.json.ServerConfigFactory;
 import rajesh.dtcframework.server.MasterServer;
 
@@ -12,9 +13,9 @@ import java.net.URL;
  */
 public class ServerFactory {
 
-    public static ServerConfig getServerConfig(String fileName) throws Exception {
+    public static JsonServerConfig getServerConfig(String fileName) throws Exception {
         URL url = System.class.getResource("/integration1/" + fileName);
         File file = new File(url.getFile());
-        return ServerConfigFactory.fromJson(file);
+        return (JsonServerConfig)ServerConfigFactory.fromJson(file);
     }
 }

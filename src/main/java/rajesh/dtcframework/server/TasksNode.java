@@ -2,8 +2,11 @@ package rajesh.dtcframework.server;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.CreateBuilder;
+import org.apache.curator.framework.api.CuratorWatcher;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rajesh.dtcframework.Task;
@@ -52,6 +55,26 @@ public class TasksNode {
         return  taskRootPath + "/" + slaveServerId;
     }
 
+    public int getNumAssignedTasks(String slaveServerId) throws Exception {
+        Stat stat = curatorFramework.checkExists().forPath(getSlaveServerTaskPath(slaveServerId));
+        return stat.getNumChildren();
+    }
+
+    /* watch for changes to the tasks and notify if there are changes
+    * Attempt to support the scheduler
+    * */
+    public void watch(Object monitor) throws Exception {
+        curatorFramework.checkExists()
+                .usingWatcher(new CuratorWatcher() {
+                    @Override
+                    public void process(WatchedEvent watchedEvent) throws Exception {
+                        synchronized (monitor) {
+                            monitor.notifyAll();
+                        }
+                    }
+                })
+                .forPath(taskRootPath);
+    }
 
     protected List<Task> getTasks(String slaveServerId) {
         String slaveServerTaskPath = taskRootPath + "/" + slaveServerId;
