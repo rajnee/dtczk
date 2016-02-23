@@ -5,9 +5,13 @@ A Simple Distributed Task Co-ordinator based on Zookeeper
 
 ##Zookeeper structure
 *DTC root: Root under which all nodes will be created
+
 *Slave Root: Root under which slaves will join processing group by creating ephemeral nodes
+
 *Master Lock: When multiple masters are present, one will be primary holding the lock, others will be standby
+
 *Tasks Root: Under this nodes will be created for each slave server
+
 *Tasks Root/Slave: Tasks for the slave will be assigned from here
 
 ##Master Server
